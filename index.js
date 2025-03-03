@@ -41,14 +41,9 @@ const app = express();
 const port = 3001;
 
 app.use(cors({
-    origin: [
-
-        'https://servertest-isos.onrender.com',
-        'https://pamoo.netlify.app'  // Replace with your actual Netlify frontend URL
-    ],
+    origin: ['https://pamoo.netlify.app', 'https://servertest-isos.onrender.com'],
     credentials: true
 }));
-
 
 app.use(
     session({
