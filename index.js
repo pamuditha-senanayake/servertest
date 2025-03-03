@@ -70,7 +70,7 @@ app.use(session({
     cookie: {
         maxAge: 1000 * 60 * 100, // 100 minutes
         httpOnly: true,
-        secure: false,
+        secure: true,
 
     },
     name: 'diamond' // The cookie name
