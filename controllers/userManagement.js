@@ -310,7 +310,8 @@ router.get("/logout", (req, res, next) => {
             res.clearCookie('diamond', {
                 path: '/',
                 httpOnly: true,
-                secure: false,
+                secure: true,
+                sameSite: "none"
 
             });
 
