@@ -316,7 +316,7 @@ router.get("/logout", (req, res, next) => {
             });
 
             // Clear any other cookies if needed (e.g., authToken)
-            res.clearCookie('authToken', { path: '/', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' });
+            res.clearCookie('diamond', { path: '/', httpOnly: true,  sameSite: 'none' });
 
             console.log("Redirecting to https://pamoo.netlify.app/");
             res.redirect('https://pamoo.netlify.app/');
