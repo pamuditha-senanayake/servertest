@@ -289,18 +289,36 @@ router.post("/login", (req, res, next) => {
 
 router.get("/logout", (req, res, next) => {
     console.log("Logout request received");
+
     req.logout((err) => {
         if (err) {
             console.error("Logout error:", err);
             return next(err);
         }
 
-        console.log("Successfully logged out, clearing cookies");
-        res.clearCookie('diamond', { path: '/' });
-        console.log("Redirecting to https://pamoo.netlify.app/");
-        res.redirect('https://pamoo.netlify.app/');
+        console.log("Successfully logged out, clearing cookies and session");
+
+        // Clear the session cookie (this will also clear the session cookie set by express-session)
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Session destruction error:", err);
+            }
+
+            // Clear the specific cookie (e.g., 'diamond')
+            res.clearCookie('diamond', {
+                path: '/',
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
+            });
+
+            console.log("Redirecting to https://pamoo.netlify.app/");
+            res.redirect('https://pamoo.netlify.app/');
+        });
     });
 });
+
+
 
 
 router.get(
