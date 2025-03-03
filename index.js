@@ -3,8 +3,8 @@ import bodyParser from "body-parser";
 import session from "express-session";
 import passport from "passport";
 import dotenv from "dotenv";
-import redis from 'redis';
-import { default as RedisStore } from 'connect-redis';
+import Redis from "ioredis";
+import { RedisStore } from 'connect-redis';
 import cors from 'cors';
 import db from './db.js';
 import userManagementController from "./controllers/userManagement.js";
@@ -49,10 +49,13 @@ app.use(cors({
 
 app.set("trust proxy", 1); //change #04- newly added
 
-const redisClient = redis.createClient({
-    host: process.env.REDIS_HOST,     // Get Redis host from environment variables
-    port: process.env.REDIS_PORT,     // Get Redis port (default 6379)
-    password: process.env.REDIS_PASSWORD, // Get Redis password from environment variables (if applicable)
+const redisClient = new Redis({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD,
+    tls: {
+        rejectUnauthorized: false,
+    },  // Disable SSL/TLS
 });
 
 redisClient.on('error', (err) => {
@@ -72,6 +75,15 @@ app.use(session({
     },
     name: 'diamond' // The cookie name
 }));
+
+redisClient.on('error', (err) => {
+    console.log('Redis connection error:', err);
+});
+
+// Testing Redis connection (Optional)
+await redisClient.set('foo', 'bar');
+console.log('Set foo to bar');
+
 // Middleware
 app.use(bodyParser.json());
 app.use('/api/employees', employeeRoutes);
