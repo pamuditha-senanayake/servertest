@@ -44,7 +44,8 @@ const port = 3001;
 
 app.use(cors({
     origin: ['https://pamoo.netlify.app', 'https://servertest-r1xa.onrender.com'],
-    credentials: true
+    credentials: true,
+    optionsSuccessStatus: 200
 }));
 
 app.set("trust proxy", 1); //change #04- newly added
