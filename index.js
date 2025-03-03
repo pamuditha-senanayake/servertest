@@ -70,8 +70,8 @@ app.use(session({
     cookie: {
         maxAge: 1000 * 60 * 100, // 100 minutes
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None',         // Necessary for cross-origin cookie handling
+        secure: false,
+
     },
     name: 'diamond' // The cookie name
 }));
