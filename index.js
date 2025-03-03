@@ -4,7 +4,7 @@ import session from "express-session";
 import passport from "passport";
 import dotenv from "dotenv";
 import redis from 'redis';
-import RedisStore from 'connect-redis';
+import { default as RedisStore } from 'connect-redis';
 import cors from 'cors';
 import db from './db.js';
 import userManagementController from "./controllers/userManagement.js";
