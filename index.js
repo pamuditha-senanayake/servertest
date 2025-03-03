@@ -74,12 +74,11 @@ app.use('/api/appointmentconfirmed', appointmentConfirmedRoutes);
 app.use('/api/appointmentrejected', appointmentRejectedRoutes);
 app.use('/api/appointmentdelete', appointmentDeleteRoutes)
 app.use('/api/testimonials', testimonialRoutes);
-app.use('/api/appointmentdelete', appointmentDeleteRoutes);
 app.use('/api/appointmentdone', appointmentDoneRoutes);
 app.use('/api/myappointment', myAllAppointmentsRoutes);
 
 
-app.use(ErrorHandler)
+
 app.use(express.json());
 
 
@@ -88,7 +87,7 @@ app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({limit: '10mb'}));
 
 app.use(express.static("public"));
-app.use(ErrorHandler);
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/api/employees", employeeRoutes);
@@ -131,3 +130,5 @@ app.use((req, res, next) => {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+app.use(ErrorHandler);

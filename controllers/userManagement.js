@@ -288,15 +288,20 @@ router.post("/login", (req, res, next) => {
 
 
 router.get("/logout", (req, res, next) => {
+    console.log("Logout request received");
     req.logout((err) => {
         if (err) {
+            console.error("Logout error:", err);
             return next(err);
         }
 
-        res.clearCookie('diamond', {path: '/'});
+        console.log("Successfully logged out, clearing cookies");
+        res.clearCookie('diamond', { path: '/' });
+        console.log("Redirecting to https://pamoo.netlify.app/");
         res.redirect('https://pamoo.netlify.app/');
     });
 });
+
 
 router.get(
     "/auth/google",
