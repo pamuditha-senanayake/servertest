@@ -45,6 +45,8 @@ app.use(cors({
     credentials: true
 }));
 
+app.set("trust proxy", 1); //change #04- newly added
+
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
@@ -52,8 +54,9 @@ app.use(
         saveUninitialized: true,
         cookie: {
             maxAge: 1000 * 60 * 100, // 100 minutes
-            httpOnly: false,
-            secure: false
+            httpOnly: true, //change #01 - false
+            secure: process.env.NODE_ENV === 'production', //change #02 - false
+            sameSite: "none",//change #03 - newly added
         },
         name: 'diamond'
     })
