@@ -286,42 +286,41 @@ router.post("/login", (req, res, next) => {
     })(req, res, next);
 });
 
-
-router.get("/logout", (req, res, next) => {
+router.get("/logout", async (req, res, next) => {
     console.log("Logout request received");
 
-    req.logout((err) => {
-        if (err) {
-            console.error("Logout error:", err);
-            return next(err);
-        }
-
-        console.log("Successfully logged out, clearing cookies and session");
-
-        // Destroy the session
-        req.session.destroy((err) => {
+    try {
+        // Destroy session in Redis
+        req.session.destroy(async (err) => {
             if (err) {
                 console.error("Session destruction error:", err);
-            } else {
-                console.log("Session destroyed successfully");
+                return res.status(500).json({ message: "Logout failed" });
             }
 
-            // Clear the cookie set by express-session (replace 'diamond' with your cookie name)
-            res.clearCookie('diamond', {
-                path: '/',
+            console.log("Session destroyed successfully");
+
+            // Explicitly remove session from Redis
+            if (req.sessionID) {
+                const redisKey = `sess:${req.sessionID}`;
+                await redisClient.del(redisKey);
+                console.log(`Deleted session from Redis: ${redisKey}`);
+            }
+
+            // Clear session cookie
+            res.clearCookie("diamond", {
+                path: "/",
                 httpOnly: true,
                 secure: true,
                 sameSite: "none"
-
             });
 
-            // Clear any other cookies if needed (e.g., authToken)
-            res.clearCookie('diamond', { path: '/', httpOnly: true,  sameSite: 'none' });
-
             console.log("Redirecting to https://pamoo.netlify.app/");
-            res.redirect('https://pamoo.netlify.app/');
+            res.redirect("https://pamoo.netlify.app/");
         });
-    });
+    } catch (error) {
+        console.error("Error during logout:", error);
+        res.status(500).json({ message: "Logout error" });
+    }
 });
 
 
