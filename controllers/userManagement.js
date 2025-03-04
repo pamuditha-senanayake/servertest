@@ -271,20 +271,53 @@ router.put('/resetu', async (req, res) => {
 });
 
 
+// router.post("/login", (req, res, next) => {
+//     passport.authenticate("local", (err, user, info) => {
+//         if (err) return next(err);
+//         if (!user) {
+//             // If authentication fails, clear cookies and redirect to the login page
+//             res.clearCookie('diamond');
+//             return res.redirect('https://pamoo.netlify.app/');
+//         }
+//         req.logIn(user, (err) => {
+//             if (err) return next(err);
+//             return roleRedirect(req, res, next); // Call roleRedirect after successful login
+//         });
+//     })(req, res, next);
+// });
+
 router.post("/login", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
-        if (err) return next(err);
-        if (!user) {
-            // If authentication fails, clear cookies and redirect to the login page
-            res.clearCookie('diamond');
-            return res.redirect('https://pamoo.netlify.app/');
+        if (err) {
+            console.error("Authentication error:", err);
+            return next(err);
         }
+
+        if (!user) {
+            console.log("Login failed. Clearing cookie and redirecting.");
+
+            res.clearCookie("diamond", {
+                path: "/",
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+            });
+
+            return res.redirect("https://pamoo.netlify.app/");
+        }
+
         req.logIn(user, (err) => {
-            if (err) return next(err);
-            return roleRedirect(req, res, next); // Call roleRedirect after successful login
+            if (err) {
+                console.error("Login error:", err);
+                return next(err);
+            }
+
+            console.log("Login successful. Redirecting based on role.");
+            return roleRedirect(req, res, next);
         });
     })(req, res, next);
 });
+
 
 router.get("/logout", async (req, res, next) => {
     console.log("Logout request received");

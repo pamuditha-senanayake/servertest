@@ -62,21 +62,36 @@ const redisClient = new Redis({
 redisClient.on('error', (err) => {
     console.log('Redis connection error:', err);
 });
+const isProduction = process.env.RENDER || process.env.NODE_ENV === "production";
 
 app.use(session({
-    store: new RedisStore({ client: redisClient }), // Use Redis store for sessions
+    store: new RedisStore({ client: redisClient }),
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
         maxAge: 1000 * 60 * 100, // 100 minutes
         httpOnly: true,
-        secure: true,
-        sameSite: "none"
-
+        secure: isProduction,  // Secure only in production
+        sameSite: isProduction ? "none" : "lax" // Adjust sameSite based on env
     },
-    name: 'diamond' // The cookie name
+    name: 'diamond'
 }));
+
+// app.use(session({
+//     store: new RedisStore({ client: redisClient }), // Use Redis store for sessions
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: {
+//         maxAge: 1000 * 60 * 100, // 100 minutes
+//         httpOnly: true,
+//         secure: true,
+//         sameSite: "none"
+//
+//     },
+//     name: 'diamond' // The cookie name
+// }));
 
 redisClient.on('error', (err) => {
     console.log('Redis connection error:', err);
