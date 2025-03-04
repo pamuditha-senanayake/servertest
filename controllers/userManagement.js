@@ -318,44 +318,88 @@ router.post("/login", (req, res, next) => {
     })(req, res, next);
 });
 
-
-router.get("/logout", async (req, res, next) => {
+router.get("/logout", (req, res, next) => {
     console.log("Logout request received");
 
-    try {
-        // Destroy session in Redis
+    const sessionID = req.sessionID; // Store session ID before destroying it
+
+    req.logout((err) => {
+        if (err) {
+            console.error("Logout error:", err);
+            return next(err);
+        }
+
+        console.log("Successfully logged out. Clearing session in Redis and deleting cookies.");
+
+        // Destroy the session in Redis
         req.session.destroy(async (err) => {
             if (err) {
                 console.error("Session destruction error:", err);
-                return res.status(500).json({ message: "Logout failed" });
+                return next(err);
             }
 
-            console.log("Session destroyed successfully");
+            console.log("Session destroyed successfully in Express.");
 
-            // Explicitly remove session from Redis
-            if (req.sessionID) {
-                const redisKey = `sess:${req.sessionID}`;
-                await redisClient.del(redisKey);
-                console.log(`Deleted session from Redis: ${redisKey}`);
+            // Manually delete the session in Redis
+            try {
+                await redisClient.del(`sess:${sessionID}`);
+                console.log("Session removed from Redis.");
+            } catch (redisErr) {
+                console.error("Error removing session from Redis:", redisErr);
             }
 
-            // Clear session cookie
+            // Clear session cookie properly
             res.clearCookie("diamond", {
                 path: "/",
                 httpOnly: true,
-                secure: true,
-                sameSite: "none"
+                secure: process.env.RENDER || process.env.NODE_ENV === "production",
+                sameSite: process.env.RENDER || process.env.NODE_ENV === "production" ? "none" : "lax"
             });
 
             console.log("Redirecting to https://pamoo.netlify.app/");
-            res.redirect("https://pamoo.netlify.app/");
+            return res.redirect("https://pamoo.netlify.app/");
         });
-    } catch (error) {
-        console.error("Error during logout:", error);
-        res.status(500).json({ message: "Logout error" });
-    }
+    });
 });
 
+
+// router.get("/logout", async (req, res, next) => {
+//     console.log("Logout request received");
+//
+//     try {
+//         // Destroy session in Redis
+//         req.session.destroy(async (err) => {
+//             if (err) {
+//                 console.error("Session destruction error:", err);
+//                 return res.status(500).json({ message: "Logout failed" });
+//             }
+//
+//             console.log("Session destroyed successfully");
+//
+//             // Explicitly remove session from Redis
+//             if (req.sessionID) {
+//                 const redisKey = `sess:${req.sessionID}`;
+//                 await redisClient.del(redisKey);
+//                 console.log(`Deleted session from Redis: ${redisKey}`);
+//             }
+//
+//             // Clear session cookie
+//             res.clearCookie("diamond", {
+//                 path: "/",
+//                 httpOnly: true,
+//                 secure: true,
+//                 sameSite: "none"
+//             });
+//
+//             console.log("Redirecting to https://pamoo.netlify.app/");
+//             res.redirect("https://pamoo.netlify.app/");
+//         });
+//     } catch (error) {
+//         console.error("Error during logout:", error);
+//         res.status(500).json({ message: "Logout error" });
+//     }
+// });
+//
 
 
 
