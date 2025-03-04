@@ -49,6 +49,8 @@ app.use(cors({
 }));
 
 app.set("trust proxy", 1); //change #04- newly added
+app.options('*', cors());  // This handles preflight requests for all routes
+
 
 const redisClient = new Redis({
     host: process.env.REDIS_HOST,
@@ -59,9 +61,6 @@ const redisClient = new Redis({
     },  // Disable SSL/TLS
 });
 
-redisClient.on('error', (err) => {
-    console.log('Redis connection error:', err);
-});
 
 export { redisClient };
 

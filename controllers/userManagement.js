@@ -319,6 +319,8 @@ router.post("/login", (req, res, next) => {
     })(req, res, next);
 });
 router.get("/logout", async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'https://pamoo.netlify.app');  // Allow this origin
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     console.log("Logout request received");
 
     const sessionID = req.sessionID; // Store session ID before destroying it
