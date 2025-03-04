@@ -62,6 +62,9 @@ const redisClient = new Redis({
 redisClient.on('error', (err) => {
     console.log('Redis connection error:', err);
 });
+
+export { redisClient };
+
 const isProduction = process.env.RENDER || process.env.NODE_ENV === "production";
 
 app.use(session({
