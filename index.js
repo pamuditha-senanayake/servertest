@@ -40,7 +40,7 @@ import addcard2 from './controllers/Addcard.js';
 dotenv.config();
 
 const app = express();
-const port = 3001;
+const port = 3002;
 
 app.use(cors({
     origin: ['https://pamoo.netlify.app', 'https://servertest-r1xa.onrender.com'],
